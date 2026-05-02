@@ -1,5 +1,59 @@
 # Changelog | 更新日志
 
+## v1.4
+
+<details>
+<summary><strong>中文版</strong></summary>
+
+- **颜色还原（Color Recovery）—— 用户最常请求的功能**：之前所有 `\p1...\p0` 绘图都被合并成一条 `<path>`，固定 `fill="#000"`，丢掉了 ASS 里的颜色/描边/阴影信息。现在转出的 SVG 会**还原以下视觉属性**：
+  - `\1c`/`\c` 主色 → `fill`（含 BGR→RGB 字节翻转）
+  - `\3c` 描边色 → `stroke`，`\bord`/`\xbord`/`\ybord` → `stroke-width`（用 `paint-order: stroke fill` 模拟 ASS 的"外侧描边"语义）
+  - `\4c` 阴影色 + `\shad`/`\xshad`/`\yshad` 偏移 → 复制一个 `<use>` 元素加 `translate` 渲染在主体下方
+  - `\1a`/`\3a`/`\4a`/`\alpha` 透明度 → `fill-opacity` / `stroke-opacity` / 阴影 opacity（注意 ASS 是反向：00=不透明，FF=透明）
+  - `\blur`/`\be` 模糊 → SVG `<filter>` + `feGaussianBlur`
+  - `\pos(x,y)` 显式位置 → 烘焙进 path 坐标，多个 drawing 会按 ASS 中定义的位置正确摆放
+- **`[V4+ Styles]` 默认值解析**：新增预扫描整个输入，把 `Style: ...` 行解析成 `name → {fill, stroke, bord, shad, ...}` 字典；每条 `Dialogue:` 的第 4 字段（Style 引用）从字典取 base 值，再被行内 `{...}` 标签覆盖。这样老 typesetting 文件（带完整 Style 块）能直接出正确颜色，不需要每行都写 `\1c`
+- **`\r` reset 标签支持**：遇到 `\r` 或 `\r<style>` 会重置到对应 base 后再继续应用同 block 内的其他标签
+- **多 path 输出 + 几何去重**：相同的 `d` 字符串只在 `<defs>` 里写一次（`<path id="pN"/>`），其余以 `<use href="#pN">` 引用。同一 drawing 在多处出现时输出体积会显著缩小
+- **新增「扁平模式（单 path）」开关**：Step 2 的 Convert 按钮旁边新增小 toggle —— 勾上后输出退化成 v1.3 的"单条黑色 path"，**保留老用户工作流**（特别是把 SVG 导入到矢量编辑器时希望干净几何）。状态写入 `localStorage`（`ass2svg-flatMode`）跨会话保留
+- **bbox / viewBox 自适应描边和阴影**：`stroke-width` × 2 + 阴影 offset + blur 半径都会被算进 viewBox 的 padding，避免边缘被裁掉
+
+### 已知不支持（取舍）
+
+- `\frz`/`\frx`/`\fry` 旋转、`\fscx`/`\fscy` 缩放、`\org` 旋转原点 —— 静态 SVG 可表达，但实现复杂度高，本版未做（如果有用户反馈再加）
+- `\fad`/`\fade`/`\t(...)`/`\move`/`\mov` —— 时间相关，静态 SVG 无对应物
+- `\clip`/`\iclip` —— 暂未实现
+- B-spline 命令（`\b1`...）—— v1.0 起就不支持，本版未变
+- `\bord` 单位假设：直接用 ASS 数值作为 path 单位的 `stroke-width`，不做 PlayRes 缩放推算（多数情况下视觉上接近，复杂场景可能偏差）
+
+</details>
+
+<details>
+<summary><strong>English</strong></summary>
+
+- **Color recovery — the most-requested feature**: previously every `\p1...\p0` block was merged into a single `<path>` with fixed `fill="#000"`, throwing away all the color/outline/shadow info ASS carries. The exported SVG now **restores these visual attributes**:
+  - `\1c`/`\c` primary color → `fill` (with BGR→RGB byte-swap)
+  - `\3c` outline color → `stroke`, `\bord`/`\xbord`/`\ybord` → `stroke-width` (uses `paint-order: stroke fill` to mimic ASS's "border on the outside" semantics)
+  - `\4c` shadow color + `\shad`/`\xshad`/`\yshad` offsets → emitted as a duplicate `<use>` element with `translate`, rendered behind the main shape via document order
+  - `\1a`/`\3a`/`\4a`/`\alpha` opacity → `fill-opacity` / `stroke-opacity` / shadow opacity (ASS uses inverted alpha: 00 = opaque, FF = transparent — handled correctly)
+  - `\blur`/`\be` blur → SVG `<filter>` with `feGaussianBlur`
+  - `\pos(x,y)` explicit position → baked into path coordinates so multiple drawings sit at their correct locations relative to each other
+- **`[V4+ Styles]` default parsing**: a new pre-pass scans the whole input and builds a `name → {fill, stroke, bord, shad, ...}` dict from `Style:` lines; each `Dialogue:` line's 4th field (style reference) pulls the base, which inline `{...}` tags then override. Existing typesetting files (with complete Style blocks) now produce correct colors without needing per-line `\1c` overrides
+- **`\r` reset tag support**: encountering `\r` or `\r<style>` resets state to the corresponding base before re-applying remaining tags in the same block
+- **Multi-path output + geometry de-duplication**: identical `d` strings are written once into `<defs>` (`<path id="pN"/>`), with everything else referencing them via `<use href="#pN">`. When a drawing repeats, output size shrinks substantially
+- **New "Flat (legacy single path)" toggle**: a small toggle next to the Convert button — when checked, output collapses back to the v1.3 "single black path" behavior, **preserving the old workflow** (especially useful when importing SVGs into a vector editor where clean geometry beats restored color). State persists in `localStorage` (`ass2svg-flatMode`) across sessions
+- **bbox / viewBox now expands for stroke and shadow**: `stroke-width` × 2 + shadow offset + blur radius are folded into viewBox padding so edges aren't clipped
+
+### Known unsupported (deliberate scope)
+
+- `\frz`/`\frx`/`\fry` rotation, `\fscx`/`\fscy` scale, `\org` rotation origin — expressible in static SVG but implementation complexity is high; not in this release (will add if requested)
+- `\fad`/`\fade`/`\t(...)`/`\move`/`\mov` — time-based, no static SVG equivalent
+- `\clip`/`\iclip` — not implemented yet
+- B-spline commands (`\b1`...) — unsupported since v1.0, unchanged
+- `\bord` unit assumption: ASS value used directly as `stroke-width` in path units, with no PlayRes scaling. Visually close in most cases; complex layouts may need manual tuning
+
+</details>
+
 ## v1.3
 
 <details>

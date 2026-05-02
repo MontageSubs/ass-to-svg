@@ -21,7 +21,7 @@
 <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-to-svg/?lang=ar">
 <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-to-svg/">
 <link rel="icon" type="image/png" href="icons/icon-256.png">
-<meta name="version" content="1.3">
+<meta name="version" content="1.4">
 <meta property="og:type" content="website">
 <meta property="og:title" content="ASS to SVG Converter · MontageSubs">
 <meta property="og:description" content="Convert Aegisub ASS/SSA \p drawing commands back into SVG vector graphics. Live preview, browser-based, free.">
@@ -529,6 +529,37 @@ h2.step-title {
 }
 .btn-primary:hover { filter: brightness(1.06); box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), inset 0 -1px 0 rgba(27,27,34,0.15), 0 6px 16px -2px rgba(31,168,94,0.6), 0 1px 2px rgba(27,27,34,0.1); }
 .btn-primary:active { transform: translateY(1px); filter: brightness(0.96); }
+
+.convert-row { display: flex; align-items: center; gap: 0.875rem; flex-wrap: wrap; }
+.flat-mode-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink2);
+  background: var(--glass-input);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--ring-soft-2);
+  border-radius: var(--r-pill);
+  padding: 0.4rem 0.85rem;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.flat-mode-label:hover { border-color: var(--ring-soft-3); background: var(--glass-input-hover); color: var(--ink); }
+.flat-mode-label input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--green);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.flat-mode-label input[type="checkbox"]:checked + span { color: var(--ink); }
 
 .custom-textarea {
   width: 100%;
@@ -1053,6 +1084,11 @@ svg.preview-svg { z-index: 1; max-width: 88%; max-height: 88%; overflow: visible
           <div class="convert-row">
             <button id="btnConvert" class="btn btn-primary convert-btn" data-i18n="btn-convert"
               aria-label="Start conversion">Convert</button>
+            <label class="flat-mode-label" for="flatMode" data-i18n-title="flat-mode-title"
+              title="Output a single black path like the v1.3 era — disables color recovery, useful for clean import into vector editors.">
+              <input type="checkbox" id="flatMode">
+              <span data-i18n="label-flat-mode">Flat (legacy single path)</span>
+            </label>
           </div>
         </div>
       </div>
@@ -1200,6 +1236,8 @@ var I18N = {
     'brand-title': 'ASS 转 SVG 矢量',
     'btn-clear': '清除',
     'btn-convert': '转换',
+    'label-flat-mode': '扁平模式（单 path）',
+    'flat-mode-title': '输出单条黑色 path（与 v1.3 行为一致）—— 关闭颜色还原，便于干净导入到矢量编辑器。',
     'btn-copy': '复制',
     'btn-discuss': '讨论',
     'btn-download': '下载 .svg',
@@ -1255,6 +1293,8 @@ var I18N = {
     'brand-title': 'ASS 轉 SVG 向量',
     'btn-clear': '清除',
     'btn-convert': '轉換',
+    'label-flat-mode': '扁平模式（單 path）',
+    'flat-mode-title': '輸出單條黑色 path（與 v1.3 行為一致）—— 關閉色彩還原，便於乾淨匯入向量編輯器。',
     'btn-copy': '複製',
     'btn-discuss': '討論',
     'btn-download': '下載 .svg',
@@ -1310,6 +1350,8 @@ var I18N = {
     'brand-title': 'ASS to SVG Converter',
     'btn-clear': 'Clear',
     'btn-convert': 'Convert',
+    'label-flat-mode': 'Flat (legacy single path)',
+    'flat-mode-title': 'Output a single black path like the v1.3 era — disables color recovery, useful for clean import into vector editors.',
     'btn-copy': 'Copy',
     'btn-discuss': 'Discussion',
     'btn-download': 'Download .svg',
@@ -1365,6 +1407,8 @@ var I18N = {
     'brand-title': 'ASS → SVG コンバーター',
     'btn-clear': 'クリア',
     'btn-convert': '変換',
+    'label-flat-mode': 'フラット (単一パス)',
+    'flat-mode-title': 'v1.3 と同じく単一の黒いパスを出力します — カラー復元を無効化し、ベクターエディタへのクリーンなインポートに適します。',
     'btn-copy': 'コピー',
     'btn-discuss': 'ディスカッション',
     'btn-download': '.svg ダウンロード',
@@ -1420,6 +1464,8 @@ var I18N = {
     'brand-title': 'ASS → SVG 변환기',
     'btn-clear': '지우기',
     'btn-convert': '변환',
+    'label-flat-mode': '플랫 (단일 경로)',
+    'flat-mode-title': 'v1.3 시절처럼 단일 검정 경로로 출력합니다 — 색상 복원을 비활성화하며, 벡터 편집기로 깔끔하게 가져올 때 유용합니다.',
     'btn-copy': '복사',
     'btn-discuss': '토론',
     'btn-download': '.svg 다운로드',
@@ -1475,6 +1521,8 @@ var I18N = {
     'brand-title': 'Conversor ASS a SVG',
     'btn-clear': 'Limpiar',
     'btn-convert': 'Convertir',
+    'label-flat-mode': 'Plano (ruta única)',
+    'flat-mode-title': 'Produce una sola ruta negra como en v1.3 — desactiva la recuperación de color, útil para importar limpiamente a editores vectoriales.',
     'btn-copy': 'Copiar',
     'btn-discuss': 'Discusión',
     'btn-download': 'Descargar .svg',
@@ -1530,6 +1578,8 @@ var I18N = {
     'brand-title': 'Conversor ASS para SVG',
     'btn-clear': 'Limpar',
     'btn-convert': 'Converter',
+    'label-flat-mode': 'Plano (caminho único)',
+    'flat-mode-title': 'Gera um único caminho preto como na v1.3 — desativa a recuperação de cor, útil para importar de forma limpa em editores vetoriais.',
     'btn-copy': 'Copiar',
     'btn-discuss': 'Discussão',
     'btn-download': 'Baixar .svg',
@@ -1585,6 +1635,8 @@ var I18N = {
     'brand-title': 'Конвертер ASS в SVG',
     'btn-clear': 'Очистить',
     'btn-convert': 'Преобразовать',
+    'label-flat-mode': 'Плоский (один путь)',
+    'flat-mode-title': 'Создаёт один чёрный путь, как в v1.3 — отключает восстановление цветов, удобно для чистого импорта в векторный редактор.',
     'btn-copy': 'Копировать',
     'btn-discuss': 'Обсуждение',
     'btn-download': 'Скачать .svg',
@@ -1640,6 +1692,8 @@ var I18N = {
     'brand-title': 'محوّل ASS إلى SVG',
     'btn-clear': 'مسح',
     'btn-convert': 'تحويل',
+    'label-flat-mode': 'مسطح (مسار واحد)',
+    'flat-mode-title': 'إخراج مسار أسود واحد مثل الإصدار 1.3 — يعطّل استعادة الألوان، مفيد للاستيراد النظيف إلى محرّرات الرسوم المتجهية.',
     'btn-copy': 'نسخ',
     'btn-discuss': 'نقاش',
     'btn-download': 'تنزيل .svg',
@@ -1695,6 +1749,8 @@ var I18N = {
     'brand-title': 'ASS - SVG Dönüştürücü',
     'btn-clear': 'Temizle',
     'btn-convert': 'Dönüştür',
+    'label-flat-mode': 'Düz (tek yol)',
+    'flat-mode-title': 'v1.3\'teki gibi tek siyah yol çıkarır — renk kurtarmayı devre dışı bırakır, vektör düzenleyiciye temiz aktarım için uygundur.',
     'btn-copy': 'Kopyala',
     'btn-discuss': 'Tartışma',
     'btn-download': '.svg İndir',
@@ -1919,6 +1975,19 @@ function applyBgSlider(val) {
   applyBgSlider(slider.value);
 })();
 
+(function initFlatMode() {
+  var cb = document.getElementById('flatMode');
+  if (!cb) return;
+  try {
+    var saved = localStorage.getItem('ass2svg-flatMode');
+    if (saved === '1') cb.checked = true;
+    else if (saved === '0') cb.checked = false;
+  } catch(_) {}
+  cb.addEventListener('change', function() {
+    try { localStorage.setItem('ass2svg-flatMode', cb.checked ? '1' : '0'); } catch(_) {}
+  });
+})();
+
 var _inputSource = null;
 var _inputFileName = '';
 var _history = [];
@@ -2084,15 +2153,181 @@ document.addEventListener('DOMContentLoaded', function() {
         return pts;
     }
 
-    // Strip a Dialogue: prefix from an ASS line, returning just the text segment.
-    function stripDialoguePrefix(line) {
-        // Format: Dialogue: Layer,Start,End,Style,Name,MarginL,MarginR,MarginV,Effect,Text
-        // We keep everything after the 9th comma.
-        var m = line.match(/^Dialogue\s*:\s*\d+(?:,[^,]*){8},(.*)$/);
-        return m ? m[1] : line;
+    // ========== ASS color / alpha utilities (v1.4: color recovery) ==========
+
+    // Parse ASS color literal: "&HBBGGRR&", "&HAABBGGRR&", or bare hex.
+    // Returns { rgb: '#RRGGBB', alpha: 0..1 or null } or null.
+    function parseAssColor(raw) {
+        if (raw == null) return null;
+        var src = String(raw).trim();
+        var m = src.match(/&H([0-9A-Fa-f]+)&?/) || src.match(/^&?([0-9A-Fa-f]+)&?$/);
+        if (!m) return null;
+        var hex = m[1].toUpperCase();
+        if (hex.length < 6) hex = ('00000000' + hex).slice(-6);
+        var alpha = null;
+        if (hex.length >= 8) {
+            var aa = hex.substring(0, hex.length - 6).slice(-2);
+            alpha = 1 - (parseInt(aa, 16) / 255);
+            hex = hex.slice(-6);
+        }
+        var bb = hex.substring(0, 2);
+        var gg = hex.substring(2, 4);
+        var rr = hex.substring(4, 6);
+        return { rgb: '#' + rr + gg + bb, alpha: alpha };
     }
 
-    // Decide if a single line should be skipped entirely (script info, formats, comments).
+    // Parse ASS alpha literal: "&HXX&" or bare 1-2 hex digits. 1=opaque, 0=transparent.
+    function parseAssAlpha(raw) {
+        if (raw == null) return null;
+        var src = String(raw).trim();
+        var m = src.match(/&H([0-9A-Fa-f]{1,2})&?/) || src.match(/^&?([0-9A-Fa-f]{1,2})&?$/);
+        if (!m) return null;
+        return Math.max(0, Math.min(1, 1 - (parseInt(m[1], 16) / 255)));
+    }
+
+    // Default style state when no [V4+ Styles] block is found.
+    function makeDefaultStyle() {
+        return {
+            fill: '#FFFFFF', fillOpacity: 1.0,
+            stroke: '#000000', strokeOpacity: 1.0,
+            strokeWidth: 0,
+            shadowColor: '#000000', shadowOpacity: 1.0,
+            shadowOffsetX: 0, shadowOffsetY: 0,
+            blur: 0,
+            posX: null, posY: null,
+            _ref: 'Default'
+        };
+    }
+
+    // Pre-pass: parse [V4+ Styles] block from full input. Returns name → base style map.
+    function parseAssStyles(fullText) {
+        var dict = {};
+        var lines = fullText.split(/\r\n|\r|\n/);
+        var fmt = null;
+        var inStyles = false;
+        for (var i = 0; i < lines.length; i++) {
+            var l = lines[i].trim();
+            if (l.startsWith('[') && l.endsWith(']')) {
+                inStyles = /^\[\s*V4\+?\s+Styles\s*\]$/i.test(l) || /^\[\s*V4\s+Styles\s*\]$/i.test(l);
+                fmt = null;
+                continue;
+            }
+            if (!inStyles) continue;
+            if (/^Format\s*:/i.test(l)) {
+                fmt = l.replace(/^Format\s*:\s*/i, '').split(/\s*,\s*/).map(function(x) { return x.toLowerCase(); });
+                continue;
+            }
+            if (/^Style\s*:/i.test(l)) {
+                var rawFields = l.replace(/^Style\s*:\s*/i, '').split(/,/);
+                var format = fmt || ['name','fontname','fontsize','primarycolour','secondarycolour','outlinecolour','backcolour','bold','italic','underline','strikeout','scalex','scaley','spacing','angle','borderstyle','outline','shadow','alignment','marginl','marginr','marginv','encoding'];
+                var rec = {};
+                for (var k = 0; k < format.length && k < rawFields.length; k++) {
+                    rec[format[k]] = (rawFields[k] || '').trim();
+                }
+                if (!rec.name) continue;
+                var base = makeDefaultStyle();
+                base._ref = rec.name;
+                var pc = parseAssColor(rec.primarycolour);
+                if (pc) { base.fill = pc.rgb; if (pc.alpha != null) base.fillOpacity = pc.alpha; }
+                var oc = parseAssColor(rec.outlinecolour);
+                if (oc) { base.stroke = oc.rgb; if (oc.alpha != null) base.strokeOpacity = oc.alpha; }
+                var sc = parseAssColor(rec.backcolour);
+                if (sc) { base.shadowColor = sc.rgb; if (sc.alpha != null) base.shadowOpacity = sc.alpha; }
+                var bordF = parseFloat(rec.outline);
+                if (!isNaN(bordF)) base.strokeWidth = bordF;
+                var shadF = parseFloat(rec.shadow);
+                if (!isNaN(shadF)) { base.shadowOffsetX = shadF; base.shadowOffsetY = shadF; }
+                dict[rec.name] = base;
+            }
+        }
+        return dict;
+    }
+
+    // Mutate `state` from one tag block (e.g. "\1c&HFF0000&\bord3").
+    // Returns the new \p scale if set in this block (else -1), and a flag indicating \r reset.
+    function applyTagsToStyle(state, tagBlock, stylesDict, fallbackBase) {
+        var src = String(tagBlock);
+        var m;
+        var newScale = -1;
+        var didReset = false;
+
+        // \r or \r<style> — reset to named/fallback base BEFORE applying remaining tags
+        if ((m = src.match(/\\r([^\\}]*?)(?=\\|$)/))) {
+            var resetName = (m[1] || '').trim();
+            var resetTo = (resetName && stylesDict && stylesDict[resetName]) || fallbackBase;
+            // Wipe state to reset baseline
+            for (var k in state) { if (state.hasOwnProperty(k)) delete state[k]; }
+            for (var k2 in resetTo) { if (resetTo.hasOwnProperty(k2)) state[k2] = resetTo[k2]; }
+            didReset = true;
+        }
+
+        if ((m = src.match(/\\p(\d+)/))) {
+            var pn = parseInt(m[1], 10);
+            newScale = pn === 0 ? 0 : Math.pow(2, pn - 1);
+        }
+        // \1c / \c primary fill color
+        if ((m = src.match(/\\1?c(&H[0-9A-Fa-f]+&?|H[0-9A-Fa-f]+)/))) {
+            var c1 = parseAssColor(m[1]);
+            if (c1) { state.fill = c1.rgb; if (c1.alpha != null) state.fillOpacity = c1.alpha; }
+        }
+        // \3c outline color
+        if ((m = src.match(/\\3c(&H[0-9A-Fa-f]+&?|H[0-9A-Fa-f]+)/))) {
+            var c3 = parseAssColor(m[1]);
+            if (c3) { state.stroke = c3.rgb; if (c3.alpha != null) state.strokeOpacity = c3.alpha; }
+        }
+        // \4c shadow color
+        if ((m = src.match(/\\4c(&H[0-9A-Fa-f]+&?|H[0-9A-Fa-f]+)/))) {
+            var c4 = parseAssColor(m[1]);
+            if (c4) { state.shadowColor = c4.rgb; if (c4.alpha != null) state.shadowOpacity = c4.alpha; }
+        }
+        // alphas
+        if ((m = src.match(/\\1a(&H[0-9A-Fa-f]+&?|H[0-9A-Fa-f]+)/))) {
+            var a1 = parseAssAlpha(m[1]); if (a1 != null) state.fillOpacity = a1;
+        }
+        if ((m = src.match(/\\3a(&H[0-9A-Fa-f]+&?|H[0-9A-Fa-f]+)/))) {
+            var a3 = parseAssAlpha(m[1]); if (a3 != null) state.strokeOpacity = a3;
+        }
+        if ((m = src.match(/\\4a(&H[0-9A-Fa-f]+&?|H[0-9A-Fa-f]+)/))) {
+            var a4 = parseAssAlpha(m[1]); if (a4 != null) state.shadowOpacity = a4;
+        }
+        if ((m = src.match(/\\alpha(&H[0-9A-Fa-f]+&?|H[0-9A-Fa-f]+)/))) {
+            var aA = parseAssAlpha(m[1]);
+            if (aA != null) {
+                state.fillOpacity = aA;
+                state.strokeOpacity = aA;
+                state.shadowOpacity = aA;
+            }
+        }
+        // outline thickness
+        if ((m = src.match(/\\bord([\d.]+)/))) state.strokeWidth = parseFloat(m[1]);
+        if ((m = src.match(/\\xbord([\d.]+)/))) state.strokeWidth = parseFloat(m[1]);
+        if ((m = src.match(/\\ybord([\d.]+)/))) state.strokeWidth = parseFloat(m[1]);
+        // shadow offset
+        if ((m = src.match(/\\shad([-\d.]+)/))) {
+            var sh = parseFloat(m[1]); state.shadowOffsetX = sh; state.shadowOffsetY = sh;
+        }
+        if ((m = src.match(/\\xshad([-\d.]+)/))) state.shadowOffsetX = parseFloat(m[1]);
+        if ((m = src.match(/\\yshad([-\d.]+)/))) state.shadowOffsetY = parseFloat(m[1]);
+        // blur
+        if ((m = src.match(/\\blur([\d.]+)/))) state.blur = parseFloat(m[1]);
+        else if ((m = src.match(/\\be(\d+)/))) state.blur = Math.min(parseFloat(m[1]), 8);
+        // explicit position
+        if ((m = src.match(/\\pos\(\s*([-\d.]+)\s*,\s*([-\d.]+)\s*\)/))) {
+            state.posX = parseFloat(m[1]); state.posY = parseFloat(m[2]);
+        }
+        return { scale: newScale, didReset: didReset };
+    }
+
+    // ========== Line helpers ==========
+
+    // Strip a Dialogue: prefix. Returns { text, styleName } where styleName is field 4.
+    // Format: Dialogue: Layer,Start,End,Style,Name,MarginL,MarginR,MarginV,Effect,Text
+    function stripDialoguePrefix(line) {
+        var m = line.match(/^Dialogue\s*:\s*\d+\s*,[^,]*,[^,]*,([^,]*)(?:,[^,]*){5},(.*)$/);
+        if (m) return { text: m[2], styleName: (m[1] || '').trim() };
+        return { text: line, styleName: null };
+    }
+
     function shouldSkipLine(line) {
         var t = line.trim();
         if (!t) return true;
@@ -2101,71 +2336,71 @@ document.addEventListener('DOMContentLoaded', function() {
         if (/^Format\s*:/i.test(t)) return true;
         if (/^Style\s*:/i.test(t)) return true;
         if (/^Comment\s*:/i.test(t)) return true;
-        // ASS script info keys like "Title:", "PlayResX:" etc. — only skip if there's no '\\p' tag.
         if (/^[A-Za-z][A-Za-z _\-]*\s*:/.test(t) && t.indexOf('\\p') === -1 && t.indexOf('{') === -1) {
             return true;
         }
         return false;
     }
 
-    // Parse one ASS text line into an ordered list of {scale, data} drawing blocks.
-    function extractDrawingBlocks(text) {
+    // Parse one ASS text line into ordered list of {scale, data, style} drawing blocks.
+    function extractDrawingBlocks(text, baseStyle, stylesDict) {
         var blocks = [];
         var scale = 0;
         var buffer = '';
         var i = 0;
+        var state = {};
+        for (var k in baseStyle) { if (baseStyle.hasOwnProperty(k)) state[k] = baseStyle[k]; }
         while (i < text.length) {
             if (text[i] === '{') {
                 if (scale > 0 && buffer.trim()) {
-                    blocks.push({scale: scale, data: buffer.trim()});
+                    var snap = {};
+                    for (var k1 in state) { if (state.hasOwnProperty(k1)) snap[k1] = state[k1]; }
+                    blocks.push({ scale: scale, data: buffer.trim(), style: snap });
                 }
                 buffer = '';
                 var end = text.indexOf('}', i);
                 if (end === -1) break;
                 var tagBlock = text.substring(i + 1, end);
-                var pm = tagBlock.match(/\\p(\d+)/);
-                if (pm) {
-                    var n = parseInt(pm[1], 10);
-                    scale = n === 0 ? 0 : Math.pow(2, n - 1); // \p1=1, \p2=2, \p3=4, \p4=8, \p5=16
-                }
+                var r = applyTagsToStyle(state, tagBlock, stylesDict, baseStyle);
+                if (r.scale !== -1) scale = r.scale;
                 i = end + 1;
             } else {
                 buffer += text[i++];
             }
         }
         if (scale > 0 && buffer.trim()) {
-            blocks.push({scale: scale, data: buffer.trim()});
+            var snap2 = {};
+            for (var k3 in state) { if (state.hasOwnProperty(k3)) snap2[k3] = state[k3]; }
+            blocks.push({ scale: scale, data: buffer.trim(), style: snap2 });
         }
-        // Fallback: no \p tag detected, but the text body looks like raw drawing data.
         if (blocks.length === 0) {
             var trimmed = text.trim().replace(/\{[^}]*\}/g, '').trim();
             if (/^[mn]\b/i.test(trimmed) && /[mlbn]/i.test(trimmed)) {
-                blocks.push({scale: 1, data: trimmed});
+                var snap3 = {};
+                for (var k4 in baseStyle) { if (baseStyle.hasOwnProperty(k4)) snap3[k4] = baseStyle[k4]; }
+                blocks.push({ scale: 1, data: trimmed, style: snap3 });
             }
         }
         return blocks;
     }
 
-    // Convert one drawing block (ASS m/l/b/n tokens at a given scale) into SVG path commands.
-    // bbox is an external object with minX/maxX/minY/maxY accumulators.
-    // Returns the path d-string fragment.
+    // Convert m/l/b tokens to SVG path d. Bakes \pos translation into coords for correct bbox.
     function blockToPathFragment(block, bbox) {
         var s = block.scale;
+        var st = block.style || {};
+        var ox = (st.posX != null) ? st.posX : 0;
+        var oy = (st.posY != null) ? st.posY : 0;
         var tokens = block.data.split(/[\s,]+/).filter(function(t) { return t.length > 0; });
         var d = '';
         var penX = 0, penY = 0;
         var i = 0;
         var seenAnyMove = false;
 
-        var asNum = function(idx) {
-            var v = parseFloat(tokens[idx]);
-            return isNaN(v) ? null : v;
-        };
+        var asNum = function(idx) { var v = parseFloat(tokens[idx]); return isNaN(v) ? null : v; };
         var isNumberAt = function(idx) {
             if (idx >= tokens.length) return false;
             return /^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$/.test(tokens[idx]);
         };
-
         var expandX = function(v) {
             if (v < bbox.minX) bbox.minX = v;
             if (v > bbox.maxX) bbox.maxX = v;
@@ -2182,7 +2417,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!isNumberAt(i) || !isNumberAt(i+1)) {
                     throw new Error(t('err-incomplete', {cmd: cmd}));
                 }
-                var x = asNum(i++) / s, y = asNum(i++) / s;
+                var x = asNum(i++) / s + ox, y = asNum(i++) / s + oy;
                 d += 'M ' + x + ' ' + y + ' ';
                 penX = x; penY = y;
                 expandX(x); expandY(y);
@@ -2192,7 +2427,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     throw new Error(t('err-incomplete', {cmd: cmd}));
                 }
                 while (isNumberAt(i) && isNumberAt(i+1)) {
-                    var lx = asNum(i++) / s, ly = asNum(i++) / s;
+                    var lx = asNum(i++) / s + ox, ly = asNum(i++) / s + oy;
                     d += 'L ' + lx + ' ' + ly + ' ';
                     penX = lx; penY = ly;
                     expandX(lx); expandY(ly);
@@ -2202,28 +2437,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     throw new Error(t('err-incomplete', {cmd: cmd}));
                 }
                 while (isNumberAt(i) && isNumberAt(i+1) && isNumberAt(i+2) && isNumberAt(i+3) && isNumberAt(i+4) && isNumberAt(i+5)) {
-                    var x1 = asNum(i++) / s, y1 = asNum(i++) / s;
-                    var x2 = asNum(i++) / s, y2 = asNum(i++) / s;
-                    var bx = asNum(i++) / s, by = asNum(i++) / s;
+                    var x1 = asNum(i++) / s + ox, y1 = asNum(i++) / s + oy;
+                    var x2 = asNum(i++) / s + ox, y2 = asNum(i++) / s + oy;
+                    var bx = asNum(i++) / s + ox, by = asNum(i++) / s + oy;
                     d += 'C ' + x1 + ' ' + y1 + ' ' + x2 + ' ' + y2 + ' ' + bx + ' ' + by + ' ';
                     bezierAxisExtrema(penX, x1, x2, bx).forEach(expandX);
                     bezierAxisExtrema(penY, y1, y2, by).forEach(expandY);
                     penX = bx; penY = by;
                 }
             } else if (lc === 's' || lc === 'p' || lc === 'c') {
-                // B-spline commands — not supported in v1. Skip following numbers.
                 while (isNumberAt(i)) i++;
             } else if (isNumberAt(i - 1)) {
-                // Stray number with no command — skip.
                 continue;
             } else {
-                // Unknown command, skip.
                 continue;
             }
         }
         if (!seenAnyMove && d) {
-            // The block had drawing without a leading 'm' — prepend an implicit 0,0 for safety.
-            d = 'M 0 0 ' + d;
+            d = 'M ' + ox + ' ' + oy + ' ' + d;
         }
         return d.trim();
     }
@@ -2235,25 +2466,93 @@ document.addEventListener('DOMContentLoaded', function() {
         return s;
     }
 
-    function buildSvgString(pathD, bbox) {
+    // Build SVG. flatMode = single black path (legacy v1.3 behavior).
+    // Otherwise: multi-path with <use>, fill/stroke/shadow/blur from per-block style.
+    function buildSvgString(blocks, bbox, flatMode) {
         if (!isFinite(bbox.minX) || !isFinite(bbox.minY)) {
-            // Empty geometry — fallback to a minimal viewBox.
-            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">\n  <path d="' + pathD + '" fill="#000"/>\n</svg>';
+            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"></svg>';
+        }
+        // Pad bbox by max stroke / shadow / blur across blocks so they don't get clipped.
+        var maxPad = 0;
+        if (!flatMode) {
+            for (var pi = 0; pi < blocks.length; pi++) {
+                var ps = blocks[pi].style || {};
+                var p = Math.max(
+                    (ps.strokeWidth || 0),
+                    Math.abs(ps.shadowOffsetX || 0) + (ps.strokeWidth || 0),
+                    Math.abs(ps.shadowOffsetY || 0) + (ps.strokeWidth || 0),
+                    (ps.blur || 0) * 2
+                );
+                if (p > maxPad) maxPad = p;
+            }
         }
         var w = bbox.maxX - bbox.minX;
         var h = bbox.maxY - bbox.minY;
         if (w <= 0) w = 1;
         if (h <= 0) h = 1;
-        var pad = Math.max(w, h) * 0.02;
+        var pad = Math.max(w, h) * 0.02 + maxPad;
         var vbX = bbox.minX - pad;
         var vbY = bbox.minY - pad;
         var vbW = w + pad * 2;
         var vbH = h + pad * 2;
-        return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' +
+        var head = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' +
             trimNumber(vbX) + ' ' + trimNumber(vbY) + ' ' +
             trimNumber(vbW) + ' ' + trimNumber(vbH) + '" width="' +
-            trimNumber(vbW) + '" height="' + trimNumber(vbH) + '">\n  <path d="' +
-            pathD + '" fill="#000"/>\n</svg>';
+            trimNumber(vbW) + '" height="' + trimNumber(vbH) + '">';
+
+        if (flatMode) {
+            var pathD = blocks.map(function(b) { return b.d; }).filter(Boolean).join(' ').trim();
+            return head + '\n  <path d="' + pathD + '" fill="#000"/>\n</svg>';
+        }
+
+        // Rich mode: dedupe path geometries into <defs>, emit <use> for each block.
+        var defs = [];
+        var body = [];
+        var pathIdMap = {};
+        var blurIdMap = {};
+        var nextPathId = 1;
+        var nextBlurId = 1;
+
+        for (var i = 0; i < blocks.length; i++) {
+            var b = blocks[i];
+            if (!b.d) continue;
+            var pid = pathIdMap[b.d];
+            if (!pid) {
+                pid = 'p' + (nextPathId++);
+                pathIdMap[b.d] = pid;
+                defs.push('<path id="' + pid + '" d="' + b.d + '"/>');
+            }
+            var st2 = b.style || {};
+            var filterAttr = '';
+            if (st2.blur > 0) {
+                var bkey = 'b' + st2.blur;
+                if (!blurIdMap[bkey]) {
+                    var bid = 'blur' + (nextBlurId++);
+                    blurIdMap[bkey] = bid;
+                    defs.push('<filter id="' + bid + '" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="' + trimNumber(st2.blur) + '"/></filter>');
+                }
+                filterAttr = ' filter="url(#' + blurIdMap[bkey] + ')"';
+            }
+            // Shadow first (renders behind via document order).
+            var hasShadow = (st2.shadowOffsetX !== 0 || st2.shadowOffsetY !== 0) && (st2.shadowOpacity || 0) > 0;
+            if (hasShadow) {
+                var sx = trimNumber(st2.shadowOffsetX || 0);
+                var sy = trimNumber(st2.shadowOffsetY || 0);
+                body.push('<use href="#' + pid + '" transform="translate(' + sx + ',' + sy + ')" fill="' + (st2.shadowColor || '#000') + '" fill-opacity="' + trimNumber(st2.shadowOpacity || 0) + '"' + filterAttr + '/>');
+            }
+            // Main path: fill (and optional stroke)
+            var attrs = ' fill="' + (st2.fill || '#000') + '" fill-opacity="' + trimNumber(st2.fillOpacity != null ? st2.fillOpacity : 1) + '"';
+            if ((st2.strokeWidth || 0) > 0 && (st2.strokeOpacity || 0) > 0) {
+                // ASS \bord is the half-thickness on the OUTSIDE of the shape; SVG stroke-width is centered.
+                // Mimic the visual weight by doubling and using paint-order so fill covers the inner half.
+                attrs += ' stroke="' + (st2.stroke || '#000') + '" stroke-opacity="' + trimNumber(st2.strokeOpacity) +
+                         '" stroke-width="' + trimNumber(st2.strokeWidth * 2) +
+                         '" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill"';
+            }
+            body.push('<use href="#' + pid + '"' + attrs + filterAttr + '/>');
+        }
+
+        return head + '\n  <defs>\n    ' + defs.join('\n    ') + '\n  </defs>\n  ' + body.join('\n  ') + '\n</svg>';
     }
 
     var btn = document.getElementById('btnConvert');
@@ -2270,46 +2569,59 @@ document.addEventListener('DOMContentLoaded', function() {
                 showToast(t('toast-too-large', {size: Math.round(rawInput.length/1024)}), 'warn');
             }
 
+            var flatModeEl = document.getElementById('flatMode');
+            var flatMode = !!(flatModeEl && flatModeEl.checked);
+
+            // Pre-pass: parse [V4+ Styles] block to extract per-style defaults.
+            var stylesDict = parseAssStyles(rawInput);
+
             var lines = rawInput.split(/\r\n|\r|\n/);
-            var blocks = [];
+            var allBlocks = [];
             for (var li = 0; li < lines.length; li++) {
                 var line = lines[li];
                 if (shouldSkipLine(line)) continue;
-                var text = stripDialoguePrefix(line);
-                var lineBlocks = extractDrawingBlocks(text);
-                for (var bi = 0; bi < lineBlocks.length; bi++) blocks.push(lineBlocks[bi]);
+                var pd = stripDialoguePrefix(line);
+                var lineBaseStyle;
+                if (pd.styleName && stylesDict[pd.styleName]) {
+                    lineBaseStyle = stylesDict[pd.styleName];
+                } else if (stylesDict['Default']) {
+                    lineBaseStyle = stylesDict['Default'];
+                } else {
+                    lineBaseStyle = makeDefaultStyle();
+                }
+                var lineBlocks = extractDrawingBlocks(pd.text, lineBaseStyle, stylesDict);
+                for (var bi = 0; bi < lineBlocks.length; bi++) allBlocks.push(lineBlocks[bi]);
             }
 
-            if (blocks.length === 0) {
+            if (allBlocks.length === 0) {
                 throw new Error(t('err-no-drawing'));
             }
 
             var bbox = {minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity};
-            var pathD = '';
-            for (var i = 0; i < blocks.length; i++) {
-                var frag = blockToPathFragment(blocks[i], bbox);
-                if (frag) pathD += frag + ' ';
+            for (var i = 0; i < allBlocks.length; i++) {
+                allBlocks[i].d = blockToPathFragment(allBlocks[i], bbox);
             }
-            pathD = pathD.trim();
-            if (!pathD) {
+
+            var combined = allBlocks.map(function(b) { return b.d; }).filter(Boolean).join(' ').trim();
+            if (!combined) {
                 throw new Error(t('toast-invalid'));
             }
 
-            var svgStr = buildSvgString(pathD, bbox);
+            var svgStr = buildSvgString(allBlocks, bbox, flatMode);
             document.getElementById('assOutput').value = svgStr;
 
-            // Render preview using the parsed path d.
-            document.getElementById('assPath').setAttribute('d', pathD);
+            // Preview: keep the simple flat path stroked in accent color (always).
+            document.getElementById('assPath').setAttribute('d', combined);
             var previewEl = document.getElementById('svgPreview');
             if (isFinite(bbox.minX) && isFinite(bbox.minY)) {
-                var w = bbox.maxX - bbox.minX, h = bbox.maxY - bbox.minY;
-                if (w <= 0) w = 100; if (h <= 0) h = 100;
-                var pad = Math.max(w, h) * 0.1;
+                var pw = bbox.maxX - bbox.minX, ph = bbox.maxY - bbox.minY;
+                if (pw <= 0) pw = 100; if (ph <= 0) ph = 100;
+                var ppad = Math.max(pw, ph) * 0.1;
                 previewEl.setAttribute('viewBox',
-                    (bbox.minX - pad) + ' ' + (bbox.minY - pad) + ' ' + (w + pad*2) + ' ' + (h + pad*2));
+                    (bbox.minX - ppad) + ' ' + (bbox.minY - ppad) + ' ' + (pw + ppad*2) + ' ' + (ph + ppad*2));
             }
 
-            showToast(t('toast-blocks', {n: blocks.length}), 'success');
+            showToast(t('toast-blocks', {n: allBlocks.length}), 'success');
         } catch (e) {
             showToast(e.message, 'error');
         }
