@@ -1,0 +1,31 @@
+{
+  "name": "Conversor ASS para SVG",
+  "short_name": "ASS para SVG",
+  "description": "Converte comandos de desenho \\p de ASS/SSA de volta para gráficos vetoriais SVG. Ferramenta moderna no navegador, 100% do lado do cliente.",
+  "start_url": "/ass-to-svg/",
+  "scope": "/ass-to-svg/",
+  "display": "standalone",
+  "background_color": "#f6f5f2",
+  "theme_color": "#c0392b",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/ass-to-svg/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/ass-to-svg/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/ass-to-svg/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
