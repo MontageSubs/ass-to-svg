@@ -1,5 +1,27 @@
 # Changelog | 更新日志
 
+## v1.4.1
+
+<details>
+<summary><strong>中文版</strong></summary>
+
+- **修复 v1.4 预览不显示颜色的问题**：v1.4 把下载的 SVG 升级成完整渲染（fill/stroke/shadow/blur），但页面下方的实时预览区还在用 v1.3 的旧路径——单条几何 path + 强制 accent color 描边——导致用户看到"下载有颜色，预览没颜色"的错位（[#2 反馈](https://github.com/MontageSubs/svg-to-ass/issues/2)）
+- **修复方式**：转换完成后，预览 `<svg id="svgPreview">` 直接采用 `buildSvgString` 生成的 `<defs>` / `<use>` 子节点和 viewBox，与下载文件视觉完全一致（颜色、描边、阴影、模糊都还原）
+- **flat 模式预览保持旧行为**：勾选「Flat (legacy single path)」时，预览仍是灰色填充 + accent 描边的"几何检视"样式（不是 v1.4.0 那条死的 accent color 描边，也不是下载文件里的纯黑实心），让用户在切换到 flat 模式时仍能清楚看到几何结构
+- 顺手做了重复 convert 的清理：之前预览每次只更新一条固定 path，逻辑上没残留问题；新逻辑会动态 inline `<defs>`/`<use>`，已加 `removeChild` 清理避免节点累积
+
+</details>
+
+<details>
+<summary><strong>English</strong></summary>
+
+- **Fix: v1.4 preview did not show colors**: v1.4 upgraded the downloaded SVG to full rendering (fill/stroke/shadow/blur), but the live preview at the bottom of the page was still on the v1.3 path — a single combined geometry path forcibly stroked in the page's accent color — so users saw "downloaded SVG has color, preview doesn't" ([#2 feedback](https://github.com/MontageSubs/svg-to-ass/issues/2))
+- **Fix approach**: after conversion, the preview `<svg id="svgPreview">` now adopts the `<defs>` / `<use>` children and viewBox emitted by `buildSvgString`, so it visually matches the downloaded file 1:1 (colors, strokes, shadows, blur all restored)
+- **Flat-mode preview keeps the old behavior**: when "Flat (legacy single path)" is on, the preview still renders as a gray-fill + accent-stroke geometry inspection (not the dead accent-stroke from v1.4.0, and not the pure black silhouette in the downloaded file), so users can still clearly see the underlying shape structure when switching to flat mode
+- Cleanup pass on repeated converts: the previous preview only updated a single fixed path so accumulation wasn't possible; the new logic dynamically inlines `<defs>`/`<use>`, with `removeChild` cleanup to keep node count stable across runs
+
+</details>
+
 ## v1.4
 
 <details>

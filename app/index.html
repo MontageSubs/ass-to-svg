@@ -21,7 +21,7 @@
 <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-to-svg/?lang=ar">
 <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-to-svg/">
 <link rel="icon" type="image/png" href="icons/icon-256.png">
-<meta name="version" content="1.4">
+<meta name="version" content="1.4.1">
 <meta property="og:type" content="website">
 <meta property="og:title" content="ASS to SVG Converter · MontageSubs">
 <meta property="og:description" content="Convert Aegisub ASS/SSA \p drawing commands back into SVG vector graphics. Live preview, browser-based, free.">
@@ -2610,15 +2610,48 @@ document.addEventListener('DOMContentLoaded', function() {
             var svgStr = buildSvgString(allBlocks, bbox, flatMode);
             document.getElementById('assOutput').value = svgStr;
 
-            // Preview: keep the simple flat path stroked in accent color (always).
-            document.getElementById('assPath').setAttribute('d', combined);
+            // Preview: mirror the downloaded SVG so colors / strokes / shadows / blur are visible.
+            // In flat mode keep the styled outline look (better for inspecting raw geometry).
             var previewEl = document.getElementById('svgPreview');
-            if (isFinite(bbox.minX) && isFinite(bbox.minY)) {
-                var pw = bbox.maxX - bbox.minX, ph = bbox.maxY - bbox.minY;
-                if (pw <= 0) pw = 100; if (ph <= 0) ph = 100;
-                var ppad = Math.max(pw, ph) * 0.1;
-                previewEl.setAttribute('viewBox',
-                    (bbox.minX - ppad) + ' ' + (bbox.minY - ppad) + ' ' + (pw + ppad*2) + ' ' + (ph + ppad*2));
+            while (previewEl.firstChild) previewEl.removeChild(previewEl.firstChild);
+
+            if (flatMode) {
+                var SVG_NS = 'http://www.w3.org/2000/svg';
+                var flatPath = document.createElementNS(SVG_NS, 'path');
+                flatPath.setAttribute('id', 'assPath');
+                flatPath.setAttribute('d', combined);
+                flatPath.setAttribute('fill', '#3d4150');
+                flatPath.setAttribute('fill-opacity', '0.9');
+                flatPath.setAttribute('stroke', '#c0392b');
+                flatPath.setAttribute('stroke-width', '1.5');
+                flatPath.setAttribute('stroke-linecap', 'round');
+                flatPath.setAttribute('style', 'vector-effect:non-scaling-stroke');
+                previewEl.appendChild(flatPath);
+
+                if (isFinite(bbox.minX) && isFinite(bbox.minY)) {
+                    var pw = bbox.maxX - bbox.minX, ph = bbox.maxY - bbox.minY;
+                    if (pw <= 0) pw = 100; if (ph <= 0) ph = 100;
+                    var ppad = Math.max(pw, ph) * 0.1;
+                    previewEl.setAttribute('viewBox',
+                        (bbox.minX - ppad) + ' ' + (bbox.minY - ppad) + ' ' + (pw + ppad*2) + ' ' + (ph + ppad*2));
+                }
+            } else {
+                // Adopt the rendered SVG's children + viewBox so the preview matches the file.
+                try {
+                    var parsedDoc = new DOMParser().parseFromString(svgStr, 'image/svg+xml');
+                    var srcSvg = parsedDoc.documentElement;
+                    var hasParseError = srcSvg.getElementsByTagName('parsererror').length > 0;
+                    if (!hasParseError) {
+                        var child = srcSvg.firstChild;
+                        while (child) {
+                            var nextChild = child.nextSibling;
+                            previewEl.appendChild(document.importNode(child, true));
+                            child = nextChild;
+                        }
+                        var srcViewBox = srcSvg.getAttribute('viewBox');
+                        if (srcViewBox) previewEl.setAttribute('viewBox', srcViewBox);
+                    }
+                } catch (_) { /* parse errors fall back to empty preview */ }
             }
 
             showToast(t('toast-blocks', {n: allBlocks.length}), 'success');
