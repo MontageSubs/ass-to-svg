@@ -27,8 +27,12 @@ It is the reverse counterpart of [SVG to ASS Draw Converter](https://subs.js.org
 
 - **Auto Precision Detection** — Automatically detects `\p1` through `\p5` (1×/2×/4×/8×/16× scale) and rescales coordinates accordingly. No manual selection.
 - **Multiple Input Formats** — Accepts full ASS/SSA subtitle files, single `Dialogue` lines, individual `{\pN}...{\p0}` tag blocks, or raw m/l/b drawing data.
+- **Full Color Recovery** — On by default. Reverses `\1c` / `\3c` / `\bord` / `\1a` / `\3a` / `\4a` / `\alpha` / `\blur` / `\pos` into SVG `fill` / `stroke` / `stroke-width` / `fill-opacity` / `stroke-opacity` / Gaussian filter / coordinate offset; ASS alpha is correctly inverted (`(255-α)/255`); shadow (`\4c\shad`) renders as a duplicate shape translated behind the main one.
+- **`[V4+ Styles]` Inheritance** — The `[V4+ Styles]` block is read; each `Dialogue` line inherits color / stroke / alpha defaults from its referenced Style, and inline `{...}` overrides apply on top.
+- **`<defs>` / `<use>` De-duplication** — Repeated geometry and repeated blur filters are emitted once into `<defs>` and re-referenced via `<use>`, keeping output file size down.
+- **"Flat (legacy single path)" Toggle** — One checkbox restores the pre-v1.4 plain-geometry output (single `<path>`, black fill) — handy for downstream Illustrator / Inkscape workflows that only care about the shape.
+- **Preview Matches Download 1:1** — The on-page preview is the exact SVG you'll download (same `<defs>` / `<use>` / colors / alphas / blur), not the placeholder solid color of earlier versions.
 - **One-Click Copy / Download** — Outputs standards-compliant SVG ready to copy or download as `.svg`.
-- **Live Vector Preview** — Renders the parsed shape in real time on the right pane, with a brightness slider to adjust the preview background.
 - **In-Browser, Client-Side** — 100% local processing, PWA offline support, no installation required.
 
 ## How to Use
@@ -66,9 +70,9 @@ The tool scans line by line; multiple `\pN ... \p0` regions per line are parsed 
 
 ## Current Limitations
 
-- **Transform tags not yet reverse-applied**: Output is a pure geometric path; `\fscx/\fscy/\frz/\pos` are not converted into SVG `transform` attributes. To restore exact placement, run "Apply Tags to All" inside Aegisub first, or add SVG `transform` manually after conversion.
-- **Color not yet recovered**: Output SVG uses default black fill (`fill="#000"`); `\c&Hbbggrr&` tags are not parsed.
-- **B-spline not yet supported**: ASS `s/p/c` cubic B-spline commands are skipped in v1.
+- **Rotation / scale / clip not yet reverse-applied**: `\frz` / `\fscx` / `\fscy` / `\org` / `\clip` are expressible in static SVG but the implementation surface is large and they're not done yet. `\pos(x,y)` is already baked into coordinates so multi-shape relative layouts come out at the correct relative spots. To bake scale or rotation back into a `transform` attribute, run "Apply Tags to All" inside Aegisub first, or add SVG `transform` manually after conversion.
+- **Time-based tags not reverse-applied**: `\fad` / `\t(...)` / `\move` have no clean static-SVG equivalent.
+- **B-spline not yet supported**: ASS `s` / `p` / `c` cubic B-spline commands are still skipped.
 
 These will be addressed in future releases. Suggestions welcome at [Issues](https://github.com/MontageSubs/ass-to-svg/issues).
 
@@ -110,7 +114,7 @@ To suggest translation fixes or expand language coverage, please open an issue a
 
 All contributions are welcome:
 
-- **Feature work** — color recovery, transform tag restoration, B-spline support, bug fixes, perf
+- **Feature work** — rotation / scale / clip tag restoration, B-spline support, bug fixes, perf
 - **Docs** — README improvements, usage guides, tutorials
 - **i18n** — translation fixes, new language support, RTL polish
 - **Feedback** — bug reports, feature requests, UX suggestions
