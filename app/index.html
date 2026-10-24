@@ -21,7 +21,7 @@
 <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-to-svg/?lang=ar">
 <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-to-svg/">
 <link rel="icon" type="image/png" href="icons/icon-256.png">
-<meta name="version" content="1.4.3">
+<meta name="version" content="1.4.4">
 <meta property="og:type" content="website">
 <meta property="og:title" content="ASS to SVG Converter · MontageSubs">
 <meta property="og:description" content="Convert Aegisub ASS/SSA \p drawing commands back into SVG vector graphics. Live preview, browser-based, free.">
@@ -986,10 +986,6 @@ svg.preview-svg { z-index: 1; max-width: 88%; max-height: 88%; overflow: visible
   margin: 0;
 }
 
-#btn-reverse:hover { background: var(--tile-3); box-shadow: 0 0 0 1px var(--ring-soft-3), inset 0 1px 0 var(--glass-highlight), 0 4px 12px -4px rgba(248,195,203,0.5); }
-
-
-#btn-reverse:hover { background: var(--tile-1); box-shadow: 0 0 0 1px var(--ring-soft-3), inset 0 1px 0 var(--glass-highlight), 0 4px 12px -4px rgba(247,210,50,0.5); }
 
 #btnDownload { background: var(--tile-4); }
 #btnDownload:hover { background: var(--tile-4); filter: brightness(1.05); box-shadow: 0 0 0 1px var(--ring-soft-3), inset 0 1px 0 var(--glass-highlight), 0 4px 12px -4px rgba(31,168,94,0.5); }
@@ -1021,6 +1017,7 @@ svg.preview-svg { z-index: 1; max-width: 88%; max-height: 88%; overflow: visible
       data-i18n="btn-install">Install</button>
     <button class="btn-hdr" id="btn-discuss" onclick="loadDiscuss()" data-i18n="btn-discuss">Discussion</button>
     <a href="https://subs.js.org/svg-to-ass/" target="_blank" rel="noopener" class="btn-hdr" data-i18n="btn-sibling">SVG to ASS</a>
+    <a href="https://subs.js.org/tools/" target="_blank" rel="noopener" class="btn-hdr" data-i18n="btn-tools">More Tools</a>
     <button class="btn-hdr" id="btn-theme" onclick="toggleTheme()" aria-label="Toggle theme" title="Toggle theme">
       <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
@@ -1262,6 +1259,7 @@ var I18N = {
     'btn-install': '安装',
     'btn-paste': '粘贴',
     'btn-sibling': 'SVG 转 ASS 工具',
+    'btn-tools': '更多工具',
     'btn-undo': '撤销',
     'btn-upload': '上传文件',
     'discuss-header': '讨论 · Discussion',
@@ -1319,6 +1317,7 @@ var I18N = {
     'btn-install': '安裝',
     'btn-paste': '貼上',
     'btn-sibling': 'SVG 轉 ASS 工具',
+    'btn-tools': '更多工具',
     'btn-undo': '撤銷',
     'btn-upload': '上傳檔案',
     'discuss-header': '討論 · Discussion',
@@ -1376,6 +1375,7 @@ var I18N = {
     'btn-install': 'Install',
     'btn-paste': 'Paste',
     'btn-sibling': 'SVG to ASS',
+    'btn-tools': 'More Tools',
     'btn-undo': 'Undo',
     'btn-upload': 'Upload File',
     'discuss-header': 'Discussion',
@@ -1433,6 +1433,7 @@ var I18N = {
     'btn-install': 'インストール',
     'btn-paste': '貼り付け',
     'btn-sibling': 'SVG → ASS',
+    'btn-tools': 'その他のツール',
     'btn-undo': '元に戻す',
     'btn-upload': 'ファイルをアップロード',
     'discuss-header': 'ディスカッション · Discussion',
@@ -1490,6 +1491,7 @@ var I18N = {
     'btn-install': '설치',
     'btn-paste': '붙여넣기',
     'btn-sibling': 'SVG → ASS',
+    'btn-tools': '더 많은 도구',
     'btn-undo': '실행 취소',
     'btn-upload': '파일 업로드',
     'discuss-header': '토론 · Discussion',
@@ -1547,6 +1549,7 @@ var I18N = {
     'btn-install': 'Instalar',
     'btn-paste': 'Pegar',
     'btn-sibling': 'SVG a ASS',
+    'btn-tools': 'Más herramientas',
     'btn-undo': 'Deshacer',
     'btn-upload': 'Subir archivo',
     'discuss-header': 'Discusión',
@@ -1604,6 +1607,7 @@ var I18N = {
     'btn-install': 'Instalar',
     'btn-paste': 'Colar',
     'btn-sibling': 'SVG para ASS',
+    'btn-tools': 'Mais ferramentas',
     'btn-undo': 'Desfazer',
     'btn-upload': 'Enviar arquivo',
     'discuss-header': 'Discussão',
@@ -1661,6 +1665,7 @@ var I18N = {
     'btn-install': 'Установить',
     'btn-paste': 'Вставить',
     'btn-sibling': 'SVG в ASS',
+    'btn-tools': 'Другие инструменты',
     'btn-undo': 'Отменить',
     'btn-upload': 'Загрузить файл',
     'discuss-header': 'Обсуждение',
@@ -1718,6 +1723,7 @@ var I18N = {
     'btn-install': 'تثبيت',
     'btn-paste': 'لصق',
     'btn-sibling': 'SVG → ASS',
+    'btn-tools': 'المزيد من الأدوات',
     'btn-undo': 'تراجع',
     'btn-upload': 'رفع ملف',
     'discuss-header': 'نقاش',
@@ -1775,6 +1781,7 @@ var I18N = {
     'btn-install': 'Yükle',
     'btn-paste': 'Yapıştır',
     'btn-sibling': 'SVG - ASS',
+    'btn-tools': 'Diğer Araçlar',
     'btn-undo': 'Geri Al',
     'btn-upload': 'Dosya Yükle',
     'discuss-header': 'Tartışma',

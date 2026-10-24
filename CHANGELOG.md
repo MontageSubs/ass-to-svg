@@ -1,5 +1,23 @@
 # Changelog | 更新日志
 
+## v1.4.4
+
+<details>
+<summary><strong>中文版</strong></summary>
+
+- **工具推荐调整**：页头新增「更多工具」入口，指向 https://subs.js.org/tools/ 。
+- **代码清理**：移除指向不存在元素的 `#btn-reverse` 悬停样式。
+
+</details>
+
+<details>
+<summary><strong>English</strong></summary>
+
+- **Tool recommendations**: added a "More Tools" header link to https://subs.js.org/tools/ .
+- **Code cleanup**: removed `#btn-reverse` hover rules that matched no element.
+
+</details>
+
 ## v1.4.3
 
 <details>
