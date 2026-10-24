@@ -21,7 +21,7 @@
 <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-to-svg/?lang=ar">
 <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-to-svg/">
 <link rel="icon" type="image/png" href="icons/icon-256.png">
-<meta name="version" content="1.4.2">
+<meta name="version" content="1.4.3">
 <meta property="og:type" content="website">
 <meta property="og:title" content="ASS to SVG Converter · MontageSubs">
 <meta property="og:description" content="Convert Aegisub ASS/SSA \p drawing commands back into SVG vector graphics. Live preview, browser-based, free.">
@@ -51,9 +51,10 @@
   "name": "ASS to SVG Converter",
   "alternateName": "ASS2SVG",
   "url": "https://subs.js.org/ass-to-svg/",
-  "description": "Browser-based reverse converter that turns Aegisub ASS/SSA \p drawing commands back into SVG vector graphics. Useful for retrieving editable vectors from typeset subtitles, archiving graphic effects, or roundtripping shapes back into a vector editor.",
+  "description": "Browser-based reverse converter that turns Aegisub ASS/SSA \\p drawing commands back into SVG vector graphics. Useful for retrieving editable vectors from typeset subtitles, archiving graphic effects, or roundtripping shapes back into a vector editor.",
   "applicationCategory": "MultimediaApplication",
   "operatingSystem": "All",
+  "browserRequirements": "Modern web browser with JavaScript ES6+ support",
   "inLanguage": [
     "en",
     "zh-CN",
@@ -79,12 +80,17 @@
   },
   "featureList": [
     "ASS/SSA drawing-command to SVG conversion",
-    "Auto-detect \p1–\p5 precision and rescale coordinates",
+    "Auto-detect \\p1–\\p5 precision and rescale coordinates",
     "Multi-block and multi-line ASS input",
     "Real-time SVG preview",
     "One-click copy + download .svg",
     "Pure browser-based processing, all data stays local"
-  ]
+  ],
+  "potentialAction": {
+    "@type": "Action",
+    "target": "https://subs.js.org/ass-to-svg/",
+    "name": "Convert ASS Drawing Commands to SVG"
+  }
 }
 </script>
 

@@ -1,5 +1,25 @@
 # Changelog | 更新日志
 
+## v1.4.3
+
+<details>
+<summary><strong>中文版</strong></summary>
+
+- **结构化数据修复**：转义 JSON-LD 中的 `\p`；此前该区块不是合法 JSON，会被搜索引擎忽略。
+- **结构化数据增强**：JSON-LD 新增 `browserRequirements` 与 `potentialAction`。
+- **部署流程**：Pages actions 升级至 Node 24 版本（configure-pages v6、upload-pages-artifact v5、deploy-pages v5）。
+
+</details>
+
+<details>
+<summary><strong>English</strong></summary>
+
+- **Structured data fix**: escaped `\p` in the JSON-LD; the block was previously invalid JSON and ignored by search engines.
+- **Structured data enhancement**: JSON-LD now includes `browserRequirements` and `potentialAction`.
+- **Deployment**: Pages actions upgraded to their Node 24 majors (configure-pages v6, upload-pages-artifact v5, deploy-pages v5).
+
+</details>
+
 ## v1.4.2
 
 <details>
