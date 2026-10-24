@@ -1,6 +1,8 @@
 'use strict';
 
-const CACHE_NAME = 'ass-to-svg-v1.4.1';
+const CACHE_PREFIX = 'ass-to-svg:';
+const LEGACY_CACHE_PREFIX = 'ass-to-svg-v';
+const CACHE_NAME = CACHE_PREFIX + 'v1.4.2';
 const PRECACHE = [
   '/ass-to-svg',
   '/ass-to-svg/',
@@ -20,7 +22,7 @@ self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
       .then(keys => Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+        keys.filter(k => k !== CACHE_NAME && (k.startsWith(CACHE_PREFIX) || k.startsWith(LEGACY_CACHE_PREFIX))).map(k => caches.delete(k))
       ))
       .then(() => self.clients.claim())
   );

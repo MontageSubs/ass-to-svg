@@ -21,7 +21,7 @@
 <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-to-svg/?lang=ar">
 <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-to-svg/">
 <link rel="icon" type="image/png" href="icons/icon-256.png">
-<meta name="version" content="1.4.1">
+<meta name="version" content="1.4.2">
 <meta property="og:type" content="website">
 <meta property="og:title" content="ASS to SVG Converter · MontageSubs">
 <meta property="og:description" content="Convert Aegisub ASS/SSA \p drawing commands back into SVG vector graphics. Live preview, browser-based, free.">
@@ -90,7 +90,6 @@
 
 <style>
 :root {
-  /* "Playground" — SuperHi-inspired, bright & playful */
   --cream:  #F4F1E8;
   --paper:  #FBF8EE;
   --ink:    #0E0E12;
@@ -114,7 +113,6 @@
   --pink:      #F8C3CB;
   --pink-tint: #FCE9EC;
 
-  /* legacy var aliases used throughout the markup */
   --ink2:  var(--ash);
   --ink3:  #8a8a93;
   --canvas:var(--cream);
@@ -138,13 +136,11 @@
   --r-lg:  16px;
   --r-pill:999px;
 
-  /* soft, layered shadows — flat first, glassy second */
   --shadow-hard: 0 1px 0 rgba(27,27,34,0.05), 0 8px 24px -12px rgba(27,27,34,0.18);
   --shadow-med:  0 1px 0 rgba(27,27,34,0.04), 0 4px 14px -8px rgba(27,27,34,0.14);
   --shadow-sm:   0 1px 0 rgba(27,27,34,0.04);
   --shadow-xs:   0 1px 0 rgba(27,27,34,0.03);
   --shadow-pop:  0 12px 32px -10px rgba(27,27,34,0.22), 0 2px 6px -2px rgba(27,27,34,0.08);
-  /* glass */
   --glass-bg: rgba(255,255,255,0.55);
   --glass-bg-strong: rgba(255,255,255,0.7);
   --glass-border: rgba(255,255,255,0.7);
@@ -153,7 +149,6 @@
   --hd-bg: var(--paper);
   --hd-fg: var(--ink);
 
-  /* TWIN VARIANT (ASS→SVG) — same Liquid system; cool/warm zones rotated, primary=green */
   --bg-base: #ECEFE0;
   --bg-glow-1: rgba(183,229,199,0.7);
   --bg-glow-2: rgba(226,227,255,0.75);
@@ -192,7 +187,6 @@
   --checker-bg: rgba(255,255,255,0.4);
 }
 
-/* ===== DARK MODE ===== */
 html[data-theme="dark"] {
   --cream:  #15161B;
   --paper:  #1C1D24;
@@ -665,7 +659,6 @@ h2.step-title {
   z-index: 0; pointer-events: none;
   transition: background 0.15s;
 }
-/* Dark mode: brighten slider track so it stays visible on dark surfaces */
 html[data-theme="dark"] .slider-group input[type="range"] {
   background: rgba(255,255,255,0.10);
   box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
@@ -955,7 +948,6 @@ svg.preview-svg { z-index: 1; max-width: 88%; max-height: 88%; overflow: visible
 }
 
 
-/* === v3.6 rebase checkbox — Liquid-styled === */
 .step-options {
   margin-top: 0.85rem;
   display: flex;
@@ -988,14 +980,11 @@ svg.preview-svg { z-index: 1; max-width: 88%; max-height: 88%; overflow: visible
   margin: 0;
 }
 
-/* === v3.7 cross-link button colorway === */
 #btn-reverse:hover { background: var(--tile-3); box-shadow: 0 0 0 1px var(--ring-soft-3), inset 0 1px 0 var(--glass-highlight), 0 4px 12px -4px rgba(248,195,203,0.5); }
 
 
-/* === v1.0 sibling-tool link colorway (points to SVG→ASS forward tool) === */
 #btn-reverse:hover { background: var(--tile-1); box-shadow: 0 0 0 1px var(--ring-soft-3), inset 0 1px 0 var(--glass-highlight), 0 4px 12px -4px rgba(247,210,50,0.5); }
 
-/* === v1.0 download button colorway === */
 #btnDownload { background: var(--tile-4); }
 #btnDownload:hover { background: var(--tile-4); filter: brightness(1.05); box-shadow: 0 0 0 1px var(--ring-soft-3), inset 0 1px 0 var(--glass-highlight), 0 4px 12px -4px rgba(31,168,94,0.5); }
 </style>
@@ -1181,6 +1170,29 @@ svg.preview-svg { z-index: 1; max-width: 88%; max-height: 88%; overflow: visible
 
 var currentLang = 'en';
 
+var STORAGE_NAMESPACE = 'ass-to-svg';
+function storageKey(name) { return STORAGE_NAMESPACE + ':' + name; }
+var LEGACY_STORAGE_KEYS = {
+  'ass2svg-lang': storageKey('lang'),
+  'ass2svg-bgSlider': storageKey('bg-slider'),
+  'ass2svg-flatMode': storageKey('flat-mode')
+};
+var LEGACY_VALUE_MAPPERS = {};
+var DISCARDED_STORAGE_KEYS = ['theme'];
+(function migrateLegacyStorage() {
+  try {
+    Object.keys(LEGACY_STORAGE_KEYS).forEach(function (legacyKey) {
+      var value = localStorage.getItem(legacyKey);
+      if (value === null) return;
+      var mapper = LEGACY_VALUE_MAPPERS[legacyKey];
+      var migrated = mapper ? mapper(value) : value;
+      var key = LEGACY_STORAGE_KEYS[legacyKey];
+      if (migrated !== null && localStorage.getItem(key) === null) localStorage.setItem(key, migrated);
+      localStorage.removeItem(legacyKey);
+    });
+    DISCARDED_STORAGE_KEYS.forEach(function (key) { localStorage.removeItem(key); });
+  } catch (_) {}
+})();
 (function() {
   function normalizeLang(raw) {
     var s = (raw || '').toLowerCase().trim();
@@ -1208,14 +1220,14 @@ var currentLang = 'en';
       var normalized = normalizeLang(urlLang);
       if (normalized && VALID[normalized]) {
         currentLang = normalized;
-        try { localStorage.setItem('ass2svg-lang', normalized); } catch(e) {}
+        try { localStorage.setItem(storageKey('lang'), normalized); } catch(e) {}
         return;
       }
     }
   } catch(e) {}
 
   try {
-    var saved = localStorage.getItem('ass2svg-lang');
+    var saved = localStorage.getItem(storageKey('lang'));
     if (saved && VALID[saved]) { currentLang = saved; return; }
   } catch(e) {}
 
@@ -1807,7 +1819,7 @@ function t(key, vars) {
 
 function applyLang(lang) {
   currentLang = lang;
-  try { localStorage.setItem('ass2svg-lang', lang); } catch(e) {}
+  try { localStorage.setItem(storageKey('lang'), lang); } catch(e) {}
   const langAttrMap = { 'zh-CN': 'zh-CN', 'zh-TW': 'zh-TW', 'pt-BR': 'pt-BR', en: 'en', ja: 'ja', ko: 'ko', es: 'es', ru: 'ru', ar: 'ar', tr: 'tr' };
   document.documentElement.lang = langAttrMap[lang] || lang;
   document.querySelectorAll('[data-i18n]').forEach(function(el) {
@@ -1894,7 +1906,6 @@ function toggleTheme() {
 }
 
 (function initTheme() {
-  try { localStorage.removeItem('theme'); } catch(_) {}
   if (!window.matchMedia) return;
   var mql = window.matchMedia('(prefers-color-scheme: dark)');
   applyTheme(mql.matches ? 'dark' : 'light');
@@ -1965,12 +1976,12 @@ function applyBgSlider(val) {
 (function initBgSlider() {
   var slider = document.getElementById('bgSlider');
   try {
-    var saved = localStorage.getItem('ass2svg-bgSlider');
+    var saved = localStorage.getItem(storageKey('bg-slider'));
     if (saved !== null) slider.value = saved;
   } catch(_) {}
   slider.addEventListener('input', function(e) {
     applyBgSlider(e.target.value);
-    try { localStorage.setItem('ass2svg-bgSlider', e.target.value); } catch(_) {}
+    try { localStorage.setItem(storageKey('bg-slider'), e.target.value); } catch(_) {}
   });
   applyBgSlider(slider.value);
 })();
@@ -1979,12 +1990,12 @@ function applyBgSlider(val) {
   var cb = document.getElementById('flatMode');
   if (!cb) return;
   try {
-    var saved = localStorage.getItem('ass2svg-flatMode');
+    var saved = localStorage.getItem(storageKey('flat-mode'));
     if (saved === '1') cb.checked = true;
     else if (saved === '0') cb.checked = false;
   } catch(_) {}
   cb.addEventListener('change', function() {
-    try { localStorage.setItem('ass2svg-flatMode', cb.checked ? '1' : '0'); } catch(_) {}
+    try { localStorage.setItem(storageKey('flat-mode'), cb.checked ? '1' : '0'); } catch(_) {}
   });
 })();
 
@@ -2153,10 +2164,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return pts;
     }
 
-    // ========== ASS color / alpha utilities (v1.4: color recovery) ==========
 
-    // Parse ASS color literal: "&HBBGGRR&", "&HAABBGGRR&", or bare hex.
-    // Returns { rgb: '#RRGGBB', alpha: 0..1 or null } or null.
     function parseAssColor(raw) {
         if (raw == null) return null;
         var src = String(raw).trim();
@@ -2176,7 +2184,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return { rgb: '#' + rr + gg + bb, alpha: alpha };
     }
 
-    // Parse ASS alpha literal: "&HXX&" or bare 1-2 hex digits. 1=opaque, 0=transparent.
     function parseAssAlpha(raw) {
         if (raw == null) return null;
         var src = String(raw).trim();
@@ -2185,7 +2192,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return Math.max(0, Math.min(1, 1 - (parseInt(m[1], 16) / 255)));
     }
 
-    // Default style state when no [V4+ Styles] block is found.
     function makeDefaultStyle() {
         return {
             fill: '#FFFFFF', fillOpacity: 1.0,
@@ -2199,7 +2205,6 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    // Pre-pass: parse [V4+ Styles] block from full input. Returns name → base style map.
     function parseAssStyles(fullText) {
         var dict = {};
         var lines = fullText.split(/\r\n|\r|\n/);
@@ -2243,19 +2248,15 @@ document.addEventListener('DOMContentLoaded', function() {
         return dict;
     }
 
-    // Mutate `state` from one tag block (e.g. "\1c&HFF0000&\bord3").
-    // Returns the new \p scale if set in this block (else -1), and a flag indicating \r reset.
     function applyTagsToStyle(state, tagBlock, stylesDict, fallbackBase) {
         var src = String(tagBlock);
         var m;
         var newScale = -1;
         var didReset = false;
 
-        // \r or \r<style> — reset to named/fallback base BEFORE applying remaining tags
         if ((m = src.match(/\\r([^\\}]*?)(?=\\|$)/))) {
             var resetName = (m[1] || '').trim();
             var resetTo = (resetName && stylesDict && stylesDict[resetName]) || fallbackBase;
-            // Wipe state to reset baseline
             for (var k in state) { if (state.hasOwnProperty(k)) delete state[k]; }
             for (var k2 in resetTo) { if (resetTo.hasOwnProperty(k2)) state[k2] = resetTo[k2]; }
             didReset = true;
@@ -2265,22 +2266,18 @@ document.addEventListener('DOMContentLoaded', function() {
             var pn = parseInt(m[1], 10);
             newScale = pn === 0 ? 0 : Math.pow(2, pn - 1);
         }
-        // \1c / \c primary fill color
         if ((m = src.match(/\\1?c(&H[0-9A-Fa-f]+&?|H[0-9A-Fa-f]+)/))) {
             var c1 = parseAssColor(m[1]);
             if (c1) { state.fill = c1.rgb; if (c1.alpha != null) state.fillOpacity = c1.alpha; }
         }
-        // \3c outline color
         if ((m = src.match(/\\3c(&H[0-9A-Fa-f]+&?|H[0-9A-Fa-f]+)/))) {
             var c3 = parseAssColor(m[1]);
             if (c3) { state.stroke = c3.rgb; if (c3.alpha != null) state.strokeOpacity = c3.alpha; }
         }
-        // \4c shadow color
         if ((m = src.match(/\\4c(&H[0-9A-Fa-f]+&?|H[0-9A-Fa-f]+)/))) {
             var c4 = parseAssColor(m[1]);
             if (c4) { state.shadowColor = c4.rgb; if (c4.alpha != null) state.shadowOpacity = c4.alpha; }
         }
-        // alphas
         if ((m = src.match(/\\1a(&H[0-9A-Fa-f]+&?|H[0-9A-Fa-f]+)/))) {
             var a1 = parseAssAlpha(m[1]); if (a1 != null) state.fillOpacity = a1;
         }
@@ -2298,30 +2295,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 state.shadowOpacity = aA;
             }
         }
-        // outline thickness
         if ((m = src.match(/\\bord([\d.]+)/))) state.strokeWidth = parseFloat(m[1]);
         if ((m = src.match(/\\xbord([\d.]+)/))) state.strokeWidth = parseFloat(m[1]);
         if ((m = src.match(/\\ybord([\d.]+)/))) state.strokeWidth = parseFloat(m[1]);
-        // shadow offset
         if ((m = src.match(/\\shad([-\d.]+)/))) {
             var sh = parseFloat(m[1]); state.shadowOffsetX = sh; state.shadowOffsetY = sh;
         }
         if ((m = src.match(/\\xshad([-\d.]+)/))) state.shadowOffsetX = parseFloat(m[1]);
         if ((m = src.match(/\\yshad([-\d.]+)/))) state.shadowOffsetY = parseFloat(m[1]);
-        // blur
         if ((m = src.match(/\\blur([\d.]+)/))) state.blur = parseFloat(m[1]);
         else if ((m = src.match(/\\be(\d+)/))) state.blur = Math.min(parseFloat(m[1]), 8);
-        // explicit position
         if ((m = src.match(/\\pos\(\s*([-\d.]+)\s*,\s*([-\d.]+)\s*\)/))) {
             state.posX = parseFloat(m[1]); state.posY = parseFloat(m[2]);
         }
         return { scale: newScale, didReset: didReset };
     }
 
-    // ========== Line helpers ==========
 
-    // Strip a Dialogue: prefix. Returns { text, styleName } where styleName is field 4.
-    // Format: Dialogue: Layer,Start,End,Style,Name,MarginL,MarginR,MarginV,Effect,Text
     function stripDialoguePrefix(line) {
         var m = line.match(/^Dialogue\s*:\s*\d+\s*,[^,]*,[^,]*,([^,]*)(?:,[^,]*){5},(.*)$/);
         if (m) return { text: m[2], styleName: (m[1] || '').trim() };
@@ -2342,7 +2332,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return false;
     }
 
-    // Parse one ASS text line into ordered list of {scale, data, style} drawing blocks.
     function extractDrawingBlocks(text, baseStyle, stylesDict) {
         var blocks = [];
         var scale = 0;
@@ -2384,7 +2373,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return blocks;
     }
 
-    // Convert m/l/b tokens to SVG path d. Bakes \pos translation into coords for correct bbox.
     function blockToPathFragment(block, bbox) {
         var s = block.scale;
         var st = block.style || {};
@@ -2466,13 +2454,10 @@ document.addEventListener('DOMContentLoaded', function() {
         return s;
     }
 
-    // Build SVG. flatMode = single black path (legacy v1.3 behavior).
-    // Otherwise: multi-path with <use>, fill/stroke/shadow/blur from per-block style.
     function buildSvgString(blocks, bbox, flatMode) {
         if (!isFinite(bbox.minX) || !isFinite(bbox.minY)) {
             return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"></svg>';
         }
-        // Pad bbox by max stroke / shadow / blur across blocks so they don't get clipped.
         var maxPad = 0;
         if (!flatMode) {
             for (var pi = 0; pi < blocks.length; pi++) {
@@ -2505,7 +2490,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return head + '\n  <path d="' + pathD + '" fill="#000"/>\n</svg>';
         }
 
-        // Rich mode: dedupe path geometries into <defs>, emit <use> for each block.
         var defs = [];
         var body = [];
         var pathIdMap = {};
@@ -2533,18 +2517,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 filterAttr = ' filter="url(#' + blurIdMap[bkey] + ')"';
             }
-            // Shadow first (renders behind via document order).
             var hasShadow = (st2.shadowOffsetX !== 0 || st2.shadowOffsetY !== 0) && (st2.shadowOpacity || 0) > 0;
             if (hasShadow) {
                 var sx = trimNumber(st2.shadowOffsetX || 0);
                 var sy = trimNumber(st2.shadowOffsetY || 0);
                 body.push('<use href="#' + pid + '" transform="translate(' + sx + ',' + sy + ')" fill="' + (st2.shadowColor || '#000') + '" fill-opacity="' + trimNumber(st2.shadowOpacity || 0) + '"' + filterAttr + '/>');
             }
-            // Main path: fill (and optional stroke)
             var attrs = ' fill="' + (st2.fill || '#000') + '" fill-opacity="' + trimNumber(st2.fillOpacity != null ? st2.fillOpacity : 1) + '"';
             if ((st2.strokeWidth || 0) > 0 && (st2.strokeOpacity || 0) > 0) {
-                // ASS \bord is the half-thickness on the OUTSIDE of the shape; SVG stroke-width is centered.
-                // Mimic the visual weight by doubling and using paint-order so fill covers the inner half.
                 attrs += ' stroke="' + (st2.stroke || '#000') + '" stroke-opacity="' + trimNumber(st2.strokeOpacity) +
                          '" stroke-width="' + trimNumber(st2.strokeWidth * 2) +
                          '" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill"';
@@ -2572,7 +2552,6 @@ document.addEventListener('DOMContentLoaded', function() {
             var flatModeEl = document.getElementById('flatMode');
             var flatMode = !!(flatModeEl && flatModeEl.checked);
 
-            // Pre-pass: parse [V4+ Styles] block to extract per-style defaults.
             var stylesDict = parseAssStyles(rawInput);
 
             var lines = rawInput.split(/\r\n|\r|\n/);
@@ -2610,8 +2589,6 @@ document.addEventListener('DOMContentLoaded', function() {
             var svgStr = buildSvgString(allBlocks, bbox, flatMode);
             document.getElementById('assOutput').value = svgStr;
 
-            // Preview: mirror the downloaded SVG so colors / strokes / shadows / blur are visible.
-            // In flat mode keep the styled outline look (better for inspecting raw geometry).
             var previewEl = document.getElementById('svgPreview');
             while (previewEl.firstChild) previewEl.removeChild(previewEl.firstChild);
 
@@ -2636,7 +2613,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         (bbox.minX - ppad) + ' ' + (bbox.minY - ppad) + ' ' + (pw + ppad*2) + ' ' + (ph + ppad*2));
                 }
             } else {
-                // Adopt the rendered SVG's children + viewBox so the preview matches the file.
                 try {
                     var parsedDoc = new DOMParser().parseFromString(svgStr, 'image/svg+xml');
                     var srcSvg = parsedDoc.documentElement;
@@ -2651,7 +2627,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         var srcViewBox = srcSvg.getAttribute('viewBox');
                         if (srcViewBox) previewEl.setAttribute('viewBox', srcViewBox);
                     }
-                } catch (_) { /* parse errors fall back to empty preview */ }
+                } catch (_) { }
             }
 
             showToast(t('toast-blocks', {n: allBlocks.length}), 'success');
